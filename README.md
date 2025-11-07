@@ -1,6 +1,6 @@
 # WutheringWaves
 
-[![Video Label](http://img.youtube.com/vi/GQf60pUdguM/0.jpg)](https://youtu.be/GQf60pUdguM)
+[![Video Label](http://img.youtube.com/vi/GQf60pUdguM/1.jpg)](https://youtu.be/GQf60pUdguM)
 
 ## 팀원
 + 정민수(팀장): 몬스터 / 전투
