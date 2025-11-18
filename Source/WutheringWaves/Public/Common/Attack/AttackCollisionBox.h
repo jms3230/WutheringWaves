@@ -34,12 +34,13 @@ protected:
 	virtual void Deactivate() override;
 
 	// Attack
-	TSet<AActor*> HitTargetSet;
+	UPROPERTY()
+	TArray<AActor*> HitTargetArray;
 	void OnHitTargetActor(AActor* HitActor);
 	// 단일 이펙트 적용 함수를 위한 멤버변수
 	FGameplayEffectSpecHandle GameplayEffectSpecHandle;
 	// 여러 이펙트 적용 함수를 위한 멤버변수
-	TArray<FGameplayEffectSpecHandle> MultipleGameplayEffectSpecHandles;
+	TArray<FGameplayEffectSpecHandle> EffectsToApplyOnHitTarget;
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

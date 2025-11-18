@@ -41,6 +41,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentHp();
 
+	UDataAsset_Startup* GetStartupData() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetEnabled(bool bIsEnabled);
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;

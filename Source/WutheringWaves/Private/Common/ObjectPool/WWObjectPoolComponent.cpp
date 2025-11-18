@@ -68,8 +68,10 @@ void UWWObjectPoolComponent::BeginPlay()
 		{
 			for (int i = 0; i < PoolSize; i++)
 			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = GetOwner();
 				AWWPooledObject* PoolableActor = World->SpawnActor<AWWPooledObject>(
-					PooledObjectClass, FVector::ZeroVector, FRotator::ZeroRotator);
+					PooledObjectClass, FVector::ZeroVector, FRotator::ZeroRotator,SpawnParams);
 				if (PoolableActor != nullptr)
 				{
 					PoolableActor->SetActive(false,nullptr);

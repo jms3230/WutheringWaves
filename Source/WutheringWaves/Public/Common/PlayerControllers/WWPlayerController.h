@@ -78,4 +78,19 @@ public:
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "HUDSharedUI")
 	UWWHUDSharedUIComponent* HUDSharedUIComponent;
+#pragma region CharacterManagement
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WWPlayerController")
+	TArray<TSubclassOf<APlayerCharacter>> PlayerCharacterClasses;
+	TArray<APlayerCharacter*> SpawnedPlayerCharacters;
+	int CurrentCharacterIndex = 0;
+public:
+	void SpawnAllCharacters();
+	APlayerCharacter* GetCurrentCharacter();
+	
+	UFUNCTION(BlueprintCallable)
+	APlayerCharacter* GetSpawnedCharacterByIndex(int Index);
+	UFUNCTION(BlueprintCallable)
+	void PossessSpawnedCharacterByIndex(int Index);
+#pragma endregion
 };

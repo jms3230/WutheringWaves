@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "WWGameModeBase.generated.h"
 
+class APlayerCharacter;
 /**
  * 
  */
@@ -16,4 +17,6 @@ class WUTHERINGWAVES_API AWWGameModeBase : public AGameModeBase
 public:
 	AWWGameModeBase();
 	
+
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 };

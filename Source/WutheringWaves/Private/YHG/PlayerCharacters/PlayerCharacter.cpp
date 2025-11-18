@@ -78,6 +78,25 @@ float APlayerCharacter::GetCurrentHp()
 	return PlayerCharacterAttributeSet->GetCurrentHp();
 }
 
+UDataAsset_Startup* APlayerCharacter::GetStartupData() const
+{
+	return StartupData.LoadSynchronous();
+}
+
+void APlayerCharacter::SetEnabled(bool bIsEnabled)
+{
+	if (bIsEnabled)
+	{
+		SetActorHiddenInGame(false);
+		SetActorEnableCollision(true);
+	}
+	else
+	{
+		SetActorHiddenInGame(true);
+		SetActorEnableCollision(false);
+	}
+}
+
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -152,6 +171,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 			LoadedData->GiveToAbilitySystemComponent(WWAbilitySystemComponent);
 		}
 	}*/
+	//초기설정
+	
+	
 }
 
 UPawnUIComponent* APlayerCharacter::GetPawnUIComponent() const

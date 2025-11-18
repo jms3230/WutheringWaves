@@ -11,6 +11,8 @@
 #include "Common/PlayerStates/WWPlayerState.h"
 #include "YHG/Components/Input/WWEnhancedInputComponent.h"
 #include "GameFramework/Character.h"
+#include "YHG/AbilitySystem/PlayerCharacterAttributeSet.h"
+#include "YHG/DataAssets/Startup/PlayerCharacterStartup.h"
 #include "YHG/PlayerCharacters/PlayerCharacter.h"
 
 AWWPlayerController::AWWPlayerController()
@@ -19,7 +21,7 @@ AWWPlayerController::AWWPlayerController()
 	bIsInputDash = false;
 	bIsInputJump = false;
 	bIsInputLightAttack = false;
-	
+
 	HeroTeamID = FGenericTeamId(0);
 
 	HUDSharedUIComponent = CreateDefaultSubobject<UWWHUDSharedUIComponent>(TEXT("HUDSharedUIComponent"));
@@ -38,7 +40,7 @@ APlayerCharacter* AWWPlayerController::GetControlledPlayerCharacter() const
 void AWWPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	
+
 	ControlledPlayerCharacter = Cast<APlayerCharacter>(InPawn);
 	// OnPossessDelegate.Broadcast(InPawn);
 }
@@ -128,29 +130,112 @@ void AWWPlayerController::Input_Look(const FInputActionValue& InputActionValue)
 
 void AWWPlayerController::Input_AbilityInputPressed(FGameplayTag InputTag)
 {
-	UWWAbilitySystemComponent* WWAbilitySystemComponent = Cast<UWWAbilitySystemComponent>(GetPlayerState<AWWPlayerState>()->GetAbilitySystemComponent());
+	UWWAbilitySystemComponent* WWAbilitySystemComponent = Cast<UWWAbilitySystemComponent>(
+		GetPlayerState<AWWPlayerState>()->GetAbilitySystemComponent());
 	if (!WWAbilitySystemComponent)
 	{
 		//Debug::Print(TEXT("WWPlayerController : Failed Cast WWAbilitySystemComponent"));
 		return;
 	}
-	
+
 	WWAbilitySystemComponent->OnAbilityInputPressed(InputTag);
 }
 
 void AWWPlayerController::Input_AbilityInputReleased(FGameplayTag InputTag)
 {
-	UWWAbilitySystemComponent* WWAbilitySystemComponent = Cast<UWWAbilitySystemComponent>(GetPlayerState<AWWPlayerState>()->GetAbilitySystemComponent());
+	UWWAbilitySystemComponent* WWAbilitySystemComponent = Cast<UWWAbilitySystemComponent>(
+		GetPlayerState<AWWPlayerState>()->GetAbilitySystemComponent());
 	if (!WWAbilitySystemComponent)
 	{
 		//Debug::Print(TEXT("WWPlayerController : Failed Cast WWAbilitySystemComponent"));
 		return;
 	}
-	
+
 	WWAbilitySystemComponent->OnAbilityInputReleased(InputTag);
 }
 
 UWWHUDSharedUIComponent* AWWPlayerController::GetHUDSharedUIComponent() const
 {
 	return HUDSharedUIComponent;
+}
+
+void AWWPlayerController::SpawnAllCharacters()
+{
+	for (TSubclassOf<APlayerCharacter> CharacterClass : PlayerCharacterClasses)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		APlayerCharacter* NewCharacter = GetWorld()->SpawnActor<APlayerCharacter>(CharacterClass,SpawnParams);
+		if (!NewCharacter)
+		{
+			continue;
+		}
+		SpawnedPlayerCharacters.AddUnique(NewCharacter);
+		NewCharacter->SetEnabled(false);
+	}
+
+	if (SpawnedPlayerCharacters.Num() > 0)
+	{
+		AWWPlayerState* WWPS = GetPlayerState<AWWPlayerState>();
+		if (IsValid(WWPS))
+		{
+			WWPS->GetAbilitySystemComponent()->InitAbilityActorInfo(WWPS, SpawnedPlayerCharacters[0]);
+			//DataAsset으로 어빌리티 부여
+			if (WWPS->CommonStartupData.IsNull())
+			{
+				//Debug::Print(TEXT("WWPlayerState : Can't find StartupData"));
+				return;
+			}
+			else
+			{
+				if (UPlayerCharacterStartup* LoadedData = WWPS->CommonStartupData.LoadSynchronous())
+				{
+					//Startup데이터가 Null이 아닌경우 StartupData는 동기화로드를 거쳐서 최종적으로 게임어빌리티시스템이 발동된다. 
+					LoadedData->GiveToAbilitySystemComponent(
+						Cast<UWWAbilitySystemComponent>(WWPS->GetAbilitySystemComponent()));
+				}
+			}
+			for (APlayerCharacter* PlayerCharacter : SpawnedPlayerCharacters)
+			{
+				WWPS->GetAbilitySystemComponent()->AddSpawnedAttribute(
+					PlayerCharacter->GetPlayerCharacterAttributeSet());
+				PlayerCharacter->GetStartupData()->GiveToAbilitySystemComponent(
+					Cast<UWWAbilitySystemComponent>(WWPS->GetAbilitySystemComponent()));
+				
+			}
+		}
+	}
+}
+
+APlayerCharacter* AWWPlayerController::GetCurrentCharacter()
+{
+	if (SpawnedPlayerCharacters.IsValidIndex(CurrentCharacterIndex))
+	{
+		return SpawnedPlayerCharacters[CurrentCharacterIndex];
+	}
+	return nullptr;
+}
+
+APlayerCharacter* AWWPlayerController::GetSpawnedCharacterByIndex(int Index)
+{
+	if (SpawnedPlayerCharacters.IsValidIndex(Index))
+	{
+		return SpawnedPlayerCharacters[Index];
+	}
+	return nullptr;
+}
+
+void AWWPlayerController::PossessSpawnedCharacterByIndex(int Index)
+{
+	if (SpawnedPlayerCharacters.IsValidIndex(Index))
+	{
+		if (IsValid(SpawnedPlayerCharacters[CurrentCharacterIndex]))
+		{
+			SpawnedPlayerCharacters[CurrentCharacterIndex]->SetEnabled(false);
+		}
+		SpawnedPlayerCharacters[Index]->SetEnabled(true);
+		Possess(SpawnedPlayerCharacters[Index]);
+		CurrentCharacterIndex = Index;
+	}
 }

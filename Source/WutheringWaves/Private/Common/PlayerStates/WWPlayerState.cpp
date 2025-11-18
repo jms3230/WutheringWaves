@@ -21,48 +21,11 @@ void AWWPlayerState::BeginPlay()
 
 	OnPawnSet.AddDynamic(this, &ThisClass::ChangedPlayerCharacter);
 
-	//초기설정
-	WWAbilitySystemComponent->InitAbilityActorInfo(this, GetPawn());
 
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetPawn());
-	if (PlayerCharacter)
-	{
-		WWAbilitySystemComponent->AddSpawnedAttribute(PlayerCharacter->GetPlayerCharacterAttributeSet());
-	}
 
 	//교안 DA_ApplYEffecttoSelf
 
-	//DataAsset으로 어빌리티 부여
-	if (CommonStartupData.IsNull())
-	{
-		//Debug::Print(TEXT("WWPlayerState : Can't find StartupData"));
-		return;
-	}
-	else
-	{
-		if (UPlayerCharacterStartup* LoadedData = CommonStartupData.LoadSynchronous())
-		{
-			//Startup데이터가 Null이 아닌경우 StartupData는 동기화로드를 거쳐서 최종적으로 게임어빌리티시스템이 발동된다. 
-			LoadedData->GiveToAbilitySystemComponent(WWAbilitySystemComponent);
-		}
-	}
-	//여기다 for문 돌려서 다른 캐릭터들 능력 전부 부여
-	for (TSoftObjectPtr<UPlayerCharacterStartup> PlayerCharacterStartup : CharacterStartupData)
-	{
-		if (PlayerCharacterStartup.IsNull())
-		{
-			//Debug::Print(TEXT("WWPlayerState : Can't find StartupData"));
-			return;
-		}
-		else
-		{
-			if (UPlayerCharacterStartup* LoadedData = PlayerCharacterStartup.LoadSynchronous())
-			{
-				//Startup데이터가 Null이 아닌경우 StartupData는 동기화로드를 거쳐서 최종적으로 게임어빌리티시스템이 발동된다. 
-				LoadedData->GiveToAbilitySystemComponent(WWAbilitySystemComponent);
-			}
-		}
-	}
+
 }
 
 void AWWPlayerState::ChangedPlayerCharacter(APlayerState* Player, APawn* NewPawn, APawn* OldPawn)

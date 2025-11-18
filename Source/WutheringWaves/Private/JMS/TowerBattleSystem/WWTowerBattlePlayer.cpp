@@ -10,12 +10,6 @@ AWWTowerBattlePlayer::AWWTowerBattlePlayer()
 	PrimaryActorTick.bCanEverTick = false;
 
 }
-
-void AWWTowerBattlePlayer::StartBattle()
-{
-	OnTowerBattleStart();
-}
-
 void AWWTowerBattlePlayer::BroadcastOnBattleFailedDelegate()
 {
 	OnBattleFailed.Broadcast();

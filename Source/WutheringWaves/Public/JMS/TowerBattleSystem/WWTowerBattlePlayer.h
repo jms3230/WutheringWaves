@@ -19,10 +19,8 @@ class WUTHERINGWAVES_API AWWTowerBattlePlayer : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AWWTowerBattlePlayer();
-	UFUNCTION(BlueprintImplementableEvent, Category = "TowerBattlePlayer")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "TowerBattlePlayer")
 	void OnTowerBattleStart();
-	UFUNCTION(BlueprintCallable, Category = "TowerBattlePlayer")
-	void StartBattle();
 	UFUNCTION(BlueprintCallable, Category = "TowerBattlePlayer")
 	void BroadcastOnBattleFailedDelegate();
 	UFUNCTION(BlueprintCallable, Category = "TowerBattlePlayer")

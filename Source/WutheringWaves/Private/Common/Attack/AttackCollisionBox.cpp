@@ -44,7 +44,7 @@ void AAttackCollisionBox::SetActive(bool IsActive, APawn* InInstigator)
 void AAttackCollisionBox::Deactivate()
 {
 	Super::Deactivate();
-	HitTargetSet.Empty();
+	HitTargetArray.Empty();
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(this, FXGameplayCueTag, FGameplayCueParameters());
 	bIsAttached = false;
@@ -55,15 +55,15 @@ void AAttackCollisionBox::Deactivate()
 void AAttackCollisionBox::OnHitTargetActor(AActor* HitActor)
 {
 	// 중복 검사
-	if (HitTargetSet.Contains(HitActor))
+	if (HitTargetArray.Contains(HitActor))
 	{
 		return;
 	}
 
-	HitTargetSet.Add(HitActor);
+	HitTargetArray.AddUnique(HitActor);
 
 	// GameplayEffectSpecHandle 적용
-	for (FGameplayEffectSpecHandle GESpecHandle : MultipleGameplayEffectSpecHandles)
+	for (FGameplayEffectSpecHandle GESpecHandle : EffectsToApplyOnHitTarget)
 	{
 		UWWBlueprintFunctionLibrary::ApplyGameplayEffectSpecHandleToTarget(HitActor, GESpecHandle);
 	}
@@ -79,7 +79,6 @@ void AAttackCollisionBox::OnBeginOverlap(UPrimitiveComponent* OverlappedComponen
                                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                          const FHitResult& SweepResult)
 {
-	//Debug::Print(FString::Printf(TEXT("Collision Begin Overlap : %s"), *OtherActor->GetActorNameOrLabel()));
 	APawn* OtherPawn = Cast<APawn>(OtherActor);
 	if (!OtherPawn)
 	{
@@ -113,8 +112,8 @@ void AAttackCollisionBox::InitializeAndAttackWithBox_Internal(float Duration, FV
 	BoxComponent->SetBoxExtent(BoxExtent);
 	SetActorLocation(Location);
 	SetActorRotation(Rotation);
-	MultipleGameplayEffectSpecHandles.Empty();
-	MultipleGameplayEffectSpecHandles = InGameplayEffectSpecHandles;
+	EffectsToApplyOnHitTarget.Empty();
+	EffectsToApplyOnHitTarget = InGameplayEffectSpecHandles;
 	FXGameplayCueTag = InFXGameplayCueTag;
 	HitReactEventTag = InHitReactEventTag;
 	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(this, FXGameplayCueTag, FGameplayCueParameters());
@@ -143,7 +142,7 @@ void AAttackCollisionBox::InitializeAttachedBoxAndAttack_Internal(FVector BoxExt
 	SetActorLocation(Location);
 	SetActorRotation(Rotation);
 	AttachToActor(GetInstigator(), FAttachmentTransformRules::KeepRelativeTransform, AttachSocketName);
-	MultipleGameplayEffectSpecHandles = InGameplayEffectSpecHandles;
+	EffectsToApplyOnHitTarget = InGameplayEffectSpecHandles;
 	FXGameplayCueTag = InFXGameplayCueTag;
 	HitReactEventTag = InHitReactEventTag;
 	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(this, FXGameplayCueTag, FGameplayCueParameters());

@@ -30,7 +30,7 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem", meta = (AllowPrivateAccess = "true"))
 	UPlayerStateAttributeSet* PlayerAttributeSet;
-	
+public:	
 	//동기식으로 데이터를 불러온다
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, category = "StartupData", meta = (AllowPrivateAccess = "true"))
 	TSoftObjectPtr<UPlayerCharacterStartup> CommonStartupData;
