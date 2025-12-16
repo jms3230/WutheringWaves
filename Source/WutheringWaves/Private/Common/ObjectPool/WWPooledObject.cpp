@@ -22,10 +22,13 @@ void AWWPooledObject::Deactivate()
 
 void AWWPooledObject::SetActive(bool IsActive, APawn* InInstigator)
 {
-	SetInstigator(InInstigator);
+	if(IsActive)
+	{
+		SetInstigator(InInstigator);
+		GetWorldTimerManager().SetTimer(LifeTimeTimerHandle, this, &AWWPooledObject::Deactivate, LifeTime, false);
+	}
 	bIsActive = IsActive;
 	SetActorHiddenInGame(!IsActive);
-	GetWorldTimerManager().SetTimer(LifeTimeTimerHandle, this, &AWWPooledObject::Deactivate, LifeTime, false);
 }
 
 void AWWPooledObject::SetLifeTime(float InLifeTime)

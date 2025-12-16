@@ -16,21 +16,12 @@ class AWWObjectPool;
 /**
  * 
  */
-UENUM()
-enum class EAttackCollisionType:uint8
-{
-	Box,
-	SphereProjectile,
-	BoxProjectile,
-	Capsule,
-};
-
 USTRUCT()
 struct FAttackCollisionPoolInfo
 {
 	GENERATED_BODY()
 	UPROPERTY(EditAnywhere)
-	EAttackCollisionType AttackCollisionType;
+	TSubclassOf<AWWPooledObject> AttackCollisionClass;
 	UPROPERTY(EditAnywhere)
 	int PoolSize = 20;
 	UPROPERTY(EditAnywhere)
@@ -47,14 +38,7 @@ public:
 	virtual void BeginPlay() override;
 
 	//IAttackCollisionPoolInterface;
-	virtual AAttackCollisionBox* EnableAttackCollisionBoxFromPool() override;
-	virtual AAttackCollisionSphereProjectile* EnableAttackCollisionSphereProjectileFromPool() override;
-	virtual AAttackCollisionBoxProjectile* EnableAttackCollisionBoxProjectileFromPool() override;
-	virtual AAttackCollisionCapsule* EnableAttackCollisionCapsuleFromPool() override;
-	
-	UFUNCTION(BlueprintCallable, Category = "Attack Collision Pool")
-	void DeactivateAllPooledObjects();
-
+	virtual AActor* EnableAttackCollisionByClass(TSubclassOf<AWWPooledObject> AttackCollisionClass) override;
 protected:
 	//중복방지를 위한 배열
 	TArray<AActor*> OverlappedActors;
@@ -62,11 +46,5 @@ protected:
 	TArray<FAttackCollisionPoolInfo> AttackCollisionPools;
 private:
 	UPROPERTY(VisibleAnywhere)
-	UWWObjectPoolComponent* AttackCollisionBoxPool;
-	UPROPERTY(VisibleAnywhere)
-	UWWObjectPoolComponent* AttackCollisionSphereProjectilePool;
-	UPROPERTY(VisibleAnywhere)
-	UWWObjectPoolComponent* AttackCollisionBoxProjectilePool;
-	UPROPERTY(VisibleAnywhere)
-	UWWObjectPoolComponent* AttackCollisionCapsulePool;
+	TMap<UClass*,UWWObjectPoolComponent*> AttackCollisionPoolMap;
 };

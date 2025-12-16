@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "AttackCollisionPoolInterface.generated.h"
 
+class AWWPooledObject;
 class AAttackCollisionCapsule;
 class AAttackCollisionBoxProjectile;
 class AAttackCollisionSphereProjectile;
@@ -26,12 +27,6 @@ class WUTHERINGWAVES_API IAttackCollisionPoolInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintCallable, Category="Attack Collision Pool Interface")
-	virtual AAttackCollisionBox* EnableAttackCollisionBoxFromPool() = 0;
-	UFUNCTION(BlueprintCallable, Category="Attack Collision Pool Interface")
-	virtual AAttackCollisionSphereProjectile* EnableAttackCollisionSphereProjectileFromPool() = 0;
-	UFUNCTION(BlueprintCallable, Category="Attack Collision Pool Interface")
-	virtual AAttackCollisionBoxProjectile* EnableAttackCollisionBoxProjectileFromPool() =0;
-	UFUNCTION(BlueprintCallable, Category="Attack Collision Pool Interface")
-	virtual AAttackCollisionCapsule* EnableAttackCollisionCapsuleFromPool() =0;
+	UFUNCTION(BlueprintCallable, Category="Attack Collision Pool Interface", meta=(DeterminesOutputType = AttackCollisionClass))
+	virtual AActor* EnableAttackCollisionByClass(TSubclassOf<AWWPooledObject> AttackCollisionClass) =0;
 };
